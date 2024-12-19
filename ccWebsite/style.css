@@ -1,0 +1,646 @@
+body {
+  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  user-select: none;
+}
+
+h3{
+  font-size: 1.1rem;
+  color: #0077cc;
+}
+
+.important{
+  font-weight: bold;
+  color: #f49f42;
+}
+
+#homePage{
+  display: flex;
+  flex-direction: column;
+}
+
+strong{
+  font-weight: bold;
+  color: #f49f42;
+}
+
+.CampusCandorContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: fit-content;
+  width: 100%;
+  background: linear-gradient(to right, #ffffff, #66a1b4);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%; 
+  height: 10vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #188ec8;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  color: #fff;
+}
+
+
+.header h1 {
+  margin: 0;
+  padding: 15px;
+  font-weight: 400;
+}
+
+.menu {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0;
+  margin-right: 40px;
+}
+
+.header a {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px;
+}
+
+.header a:hover {
+  color: #f49f42;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.CampusLogo {
+  background-image: url("/images/Candor_Campus_logo_Blanc.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 250px;
+  height: 100px;
+  margin-left: 30px;
+}
+
+/* Adjusting the hat */
+#universityHAT {
+  background-image: url("/images/UNIVERSITYHAT.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 250px;
+  height: 150px;
+  position: absolute; /* Position it above the container */
+  top: calc(50% - 31.5%); /* Adjust position to align with CCbody-container */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Center the hat exactly */
+  z-index: 10; /* Ensure it's above the container */
+}
+
+/* Main container */
+.CCbody {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  width: 100%;
+  background: linear-gradient(to right, #66a1b4, #ffffff);
+  border-bottom: #f49f42 2px solid;
+  position: relative; /* Needed for positioning the hat */
+}
+
+/* Content container */
+.CCbody-container {
+  z-index: 1;
+  border-left: 4px solid #f49f42;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 70%;
+  height: 60%;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+
+/* Contenu textuel */
+.CCbody-content {
+  padding: 40px;
+  width: 50%;
+}
+
+.CCbody-title {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #0077cc;
+  text-align: left;
+}
+
+.CCbody-text {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+/* Bouton */
+.goToForm {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #0077cc;
+  color: #fff;
+  font-size: 1rem;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.goToForm:hover {
+  background-color: #005fa3;
+  cursor: pointer;
+}
+
+/* Section image */
+.CCbody-image {
+  background-image: url("/images/daryl-removebg-preview.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 50%;
+  height: 100%;
+}
+
+/* Section A Propos */
+.about-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+    background-color: #f4f9fb;
+  }
+  
+  .about-container {
+    width: 50%;
+    text-align: left;
+  }
+  
+  .about-title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #0077cc;
+  }
+  
+  .about-text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 15px;
+  }
+  
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .CCbody-container {
+    flex-direction: column;
+  }
+  .CCbody-content,
+  .CCbody-image {
+    width: 100%;
+  }
+  .CCbody-content {
+    padding: 20px;
+  }
+  .CCbody-title {
+    font-size: 2rem;
+  }
+  .CCbody-text {
+    font-size: 1rem;
+  }
+}
+
+/* Section Formations */
+.services-section {
+    background-color: #f9f9f9;
+    padding: 0px 20px 30px 20px;
+    height: fit-content;
+  }
+  .services-container {
+    width: 50%;
+    text-align: left;
+    margin: 0 auto;
+  }
+  
+  .services-title {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #0077cc;
+  }
+  
+  .services-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 colonnes */
+    gap: 20px; /* Espacement entre les cartes */
+  }
+  
+  .service-item {
+    user-select: none;
+    background: #fff;
+    border: 1px solid #f49f42;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .service-item:hover {
+    border: 1px solid #188ec8;  
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background-color: #f6f5f5;
+  }
+  
+  .service-title {
+    font-size: 1.3rem;
+    color: #0077cc;
+    margin-bottom: 10px;
+  }
+  
+  .service-text {
+    font-size: 1rem;
+    color: #555;
+  }
+  /* Section Contact */
+/* Section Contact */
+
+/* Notification popup */
+.notification-popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #0077cc;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+}
+
+.notification-popup.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.notification-popup.hidden {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+
+.contact-section {
+    background-color: #f4f9fb;
+    width: 100%;
+    height: fit-content;
+    padding: 60px 0px;
+    text-align: center;
+  }
+  
+  .contact-container {
+    text-align: left;
+    max-width: 1000px;
+    width: 50%;
+    margin: 0 auto;
+    border-radius: 10px;
+  }
+  
+  .contact-title {
+    padding-left: 5px;
+    font-size: 2.5rem;
+    color: #0077cc;
+  }
+
+  .contact-p{
+    padding-left: 5px;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 30px;
+  }
+  
+  .contact-details {
+    display: flex;
+    justify-content: space-between; /* Espacement entre les cartes */
+    gap: 20px; /* Espacement latéral entre les contacts */
+  }
+  
+  .contact-item {
+    border: 1px solid #f49f42;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    flex: 1; /* Permet aux éléments de prendre un espace égal */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .contact-item:hover {
+    border: 1px solid #188ec8;  
+    transform: translateY(-5px);
+    background-color: #f6f5f5;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+  
+  .contact-subtitle {
+    font-size: 1.5rem;
+    color: #188ec8;
+    margin-bottom: 10px;
+  }
+  
+  .contact-text {
+    user-select: text;
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+  }
+  
+  .contact-text strong {
+    color: #0077cc;
+  }
+
+  .formation-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, #66a1b4, #ffffff);
+    width: 100%;
+    height: 90vh;
+  }
+  
+  #for001, #for002, #for004, #for006, #for007, #for009, #for010, #for011, #for012{
+    display: none;
+  }
+
+  /* Section principale */
+.formation-section {
+  margin-top: 30px;
+  padding: 30px 80px 30px 80px;
+  width: 70%;
+  border-left: 4px solid #f49f42;
+  border-radius: 15px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.formation-title {
+  font-size: 32px;
+  color: #0077cc;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.formation-p{
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.formation-description {
+  font-size: 17px;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+h2 {
+  font-size: 24px;
+  color: #0077cc;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+ul {
+  list-style-type: square;
+  margin-left: 30px;
+  font-size: 17px;
+  color: #666;
+}
+
+ul li {
+  margin-bottom: 10px;
+}
+
+/* Pied de page */
+footer {
+  background-color: #0077cc;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
+.back-button {
+  position: fixed;
+  left: 2%;
+  top: 12%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  background-color: transparent;
+  font-size: 3rem;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.back-button:hover {
+  transform: scale(1.02);
+  text-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
+}
+
+
+  /* Section formulaire de rendez-vous */
+  #appointment-section {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 90vh;
+    background: linear-gradient(to right, #66a1b4, #ffffff);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+  
+  .appointment-container {
+    display: flex;
+    border-left: 4px solid #f49f42;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 45%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);  
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 15px;
+  }
+
+  .appointment-title {
+    font-size: 32px;
+    width: 600px;
+    font-weight: bold;
+    color: #0077cc;
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  
+  .appointment-description {
+    font-size: 16px;
+    width: 600px;
+    text-align: left;
+    margin-bottom: 30px;
+    color: #555;
+  }
+  
+  .appointment-form {
+    width: 600px;
+    margin: 0 auto;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+  
+  input:focus,
+  textarea:focus {
+    border-color: #0077cc;
+    outline: none;
+    box-shadow: 0px 0px 5px rgba(0, 77, 153, 0.5);
+  }
+  
+  textarea {
+    resize: none;
+    min-height: 100px;
+  }
+  
+  .submit-button {
+    width: 100%;
+    background-color: #0077cc;
+    color: white;
+    font-size: 18px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #005fa3;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .appointment-section {
+      padding: 20px;
+    }
+  
+    .appointment-title {
+      font-size: 28px;
+    }
+  
+    .appointment-description {
+      font-size: 14px;
+    }
+  }
+  
+  
+
+/* Section Responsive */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .menu {
+    flex-direction: column;
+    margin-top: 15px;
+  }
+
+  .menu-item {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .formation-section {
+    padding: 20px;
+  }
+
+  .formation-title {
+    font-size: 28px;
+  }
+
+  .formation-description {
+    font-size: 16px;
+  }
+
+  .formation-button {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+}
