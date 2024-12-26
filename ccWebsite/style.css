@@ -1,5 +1,5 @@
 body {
-  background-color: #ffffff;
+  background: linear-gradient(to right, #66a1b4, #ffffff);
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
@@ -8,22 +8,22 @@ body {
   user-select: none;
 }
 
-h3{
+h3 {
   font-size: 1.1rem;
   color: #0077cc;
 }
 
-.important{
+.important {
   font-weight: bold;
   color: #f49f42;
 }
 
-#homePage{
+#homePage {
   display: flex;
   flex-direction: column;
 }
 
-strong{
+strong {
   font-weight: bold;
   color: #f49f42;
 }
@@ -42,7 +42,7 @@ strong{
   position: sticky;
   top: 0;
   z-index: 1000;
-  width: 100%; 
+  width: 100%;
   height: 10vh;
   display: flex;
   flex-direction: row;
@@ -51,7 +51,6 @@ strong{
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   color: #fff;
 }
-
 
 .header h1 {
   margin: 0;
@@ -142,7 +141,6 @@ strong{
   position: relative;
 }
 
-
 /* Contenu textuel */
 .CCbody-content {
   padding: 40px;
@@ -194,105 +192,88 @@ strong{
 
 /* Section A Propos */
 .about-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 60px 20px;
-    background-color: #f4f9fb;
-  }
-  
-  .about-container {
-    width: 50%;
-    text-align: left;
-  }
-  
-  .about-title {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: #0077cc;
-  }
-  
-  .about-text {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    color: #555;
-    margin-bottom: 15px;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  background-color: #f9f9f9;
+}
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .CCbody-container {
-    flex-direction: column;
-  }
-  .CCbody-content,
-  .CCbody-image {
-    width: 100%;
-  }
-  .CCbody-content {
-    padding: 20px;
-  }
-  .CCbody-title {
-    font-size: 2rem;
-  }
-  .CCbody-text {
-    font-size: 1rem;
-  }
+.about-container {
+  width: 50%;
+  text-align: left;
+}
+
+.about-title {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #0077cc;
+}
+
+.about-text {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 15px;
 }
 
 /* Section Formations */
 .services-section {
-    background-color: #f9f9f9;
-    padding: 0px 20px 30px 20px;
-    height: fit-content;
-  }
-  .services-container {
-    width: 50%;
-    text-align: left;
-    margin: 0 auto;
-  }
-  
-  .services-title {
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-    color: #0077cc;
-  }
-  
-  .services-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 colonnes */
-    gap: 20px; /* Espacement entre les cartes */
-  }
-  
-  .service-item {
-    user-select: none;
-    background: #fff;
-    border: 1px solid #f49f42;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    cursor: pointer;
-  }
-  
-  .service-item:hover {
-    border: 1px solid #188ec8;  
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    background-color: #f6f5f5;
-  }
-  
-  .service-title {
-    font-size: 1.3rem;
-    color: #0077cc;
-    margin-bottom: 10px;
-  }
-  
-  .service-text {
-    font-size: 1rem;
-    color: #555;
-  }
-  /* Section Contact */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 0px 20px 30px 20px;
+  height: fit-content;
+}
+.services-container {
+  width: 50%;
+  text-align: left;
+  margin: 0 auto;
+}
+
+.services-title {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #0077cc;
+}
+
+.services-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 colonnes */
+  gap: 20px; /* Espacement entre les cartes */
+}
+
+.service-item {
+  user-select: none;
+  background: #f4f9fb;
+  border: 1px solid #f49f42;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease,
+    background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.service-item:hover {
+  border: 1px solid #188ec8;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  background-color: #f6f5f5;
+}
+
+.service-title {
+  font-size: 1.3rem;
+  color: #0077cc;
+  margin-bottom: 10px;
+}
+
+.service-text {
+  font-size: 1rem;
+  color: #555;
+}
+/* Section Contact */
 /* Section Contact */
 
 /* Notification popup */
@@ -322,94 +303,102 @@ strong{
   transform: translateY(20px);
 }
 
-
 .contact-section {
-    background-color: #f4f9fb;
-    width: 100%;
-    height: fit-content;
-    padding: 60px 0px;
-    text-align: center;
-  }
-  
-  .contact-container {
-    text-align: left;
-    max-width: 1000px;
-    width: 50%;
-    margin: 0 auto;
-    border-radius: 10px;
-  }
-  
-  .contact-title {
-    padding-left: 5px;
-    font-size: 2.5rem;
-    color: #0077cc;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+  width: 100%;
+  height: fit-content;
+  text-align: center;
+}
 
-  .contact-p{
-    padding-left: 5px;
-    font-size: 1.2rem;
-    line-height: 1.8;
-    color: #555;
-    margin-bottom: 30px;
-  }
-  
-  .contact-details {
-    display: flex;
-    justify-content: space-between; /* Espacement entre les cartes */
-    gap: 20px; /* Espacement latéral entre les contacts */
-  }
-  
-  .contact-item {
-    border: 1px solid #f49f42;
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    text-align: left;
-    flex: 1; /* Permet aux éléments de prendre un espace égal */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .contact-item:hover {
-    border: 1px solid #188ec8;  
-    transform: translateY(-5px);
-    background-color: #f6f5f5;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-  }
-  
-  .contact-subtitle {
-    font-size: 1.5rem;
-    color: #188ec8;
-    margin-bottom: 10px;
-  }
-  
-  .contact-text {
-    user-select: text;
-    font-size: 1rem;
-    color: #555;
-    line-height: 1.6;
-  }
-  
-  .contact-text strong {
-    color: #0077cc;
-  }
+.contact-container {
+  text-align: left;
+  padding: 60px 25px;
+  width: 50%;
+  border-radius: 10px;
+}
 
-  .formation-container{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(to right, #66a1b4, #ffffff);
-    width: 100%;
-    height: 90vh;
-  }
-  
-  #for001, #for002, #for004, #for006, #for007, #for009, #for010, #for011, #for012{
-    display: none;
-  }
+.contact-title {
+  padding-left: 5px;
+  font-size: 2.5rem;
+  color: #0077cc;
+}
 
-  /* Section principale */
+.contact-p {
+  padding-left: 5px;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.contact-details {
+  display: flex;
+  justify-content: space-between; /* Espacement entre les cartes */
+  gap: 20px; /* Espacement latéral entre les contacts */
+}
+
+.contact-item {
+  border: 1px solid #f49f42;
+  background: #f4f9fb;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  flex: 1; /* Permet aux éléments de prendre un espace égal */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-item:hover {
+  border: 1px solid #188ec8;
+  transform: translateY(-5px);
+  background-color: #f6f5f5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.contact-subtitle {
+  font-size: 1.5rem;
+  color: #188ec8;
+  margin-bottom: 10px;
+}
+
+.contact-text {
+  user-select: text;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.contact-text strong {
+  color: #0077cc;
+}
+
+.formation-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to right, #66a1b4, #ffffff);
+  width: 100%;
+  height: 90vh;
+}
+
+#for001,
+#for002,
+#for004,
+#for006,
+#for007,
+#for009,
+#for010,
+#for011,
+#for012 {
+  display: none;
+}
+
+/* Section principale */
 .formation-section {
   margin-top: 30px;
   padding: 30px 80px 30px 80px;
@@ -427,7 +416,7 @@ strong{
   font-weight: bold;
 }
 
-.formation-p{
+.formation-p {
   font-size: 1.2rem;
   line-height: 1.8;
   color: #555;
@@ -492,155 +481,555 @@ footer {
   text-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
 }
 
+/* Section formulaire de rendez-vous */
+#appointment-section {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 90vh;
+  background: linear-gradient(to right, #66a1b4, #ffffff);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
 
-  /* Section formulaire de rendez-vous */
-  #appointment-section {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 90vh;
-    background: linear-gradient(to right, #66a1b4, #ffffff);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+.appointment-container {
+  display: flex;
+  border-left: 4px solid #f49f42;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 45%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 15px;
+}
+
+.appointment-title {
+  font-size: 32px;
+  width: 600px;
+  font-weight: bold;
+  color: #0077cc;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.appointment-description {
+  font-size: 16px;
+  width: 600px;
+  text-align: left;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.appointment-form {
+  width: 600px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="password"],
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #0077cc;
+  outline: none;
+  box-shadow: 0px 0px 5px rgba(0, 77, 153, 0.5);
+}
+
+textarea {
+  resize: none;
+  min-height: 100px;
+}
+
+.submit-button {
+  width: 100%;
+  background-color: #0077cc;
+  color: white;
+  font-size: 18px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #005fa3;
+}
+
+.loginContainer{
+  border-left: 4px solid #f49f42;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 20px 35px 20px;
+  width: 400px;
+  height: fit-content;
+  border-radius: 15px;
+  background-color: #f4f9fb;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  
+}
+
+.textLogin{
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.loginContainer label{
+  font-size: 1.1rem;
+  color: #005fa3;
+  margin-bottom: 10px;
+}
+
+.loginContainer h2{
+  font-size: 2.4rem;
+}
+
+#adminLogin{
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 90vh;
+}
+
+#errorMessage {
+  font-size: 0.9rem;
+  color: red;
+  margin-top: 10px;
+}
+
+/* General Admin Panel Styles */
+#adminPanel {
+  background-color: #f4f9fb;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.admin-container {
+  max-width: 900px;
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.admin-container h2 {
+  font-size: 2rem;
+  color: #0077cc;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.formation-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.formation-actions button {
+  background-color: #0077cc;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.formation-actions button:hover {
+  background-color: #005fa3;
+}
+
+/* Table Styles */
+#formationsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#formationsTable th,
+#formationsTable td {
+  text-align: left;
+  padding: 12px;
+  font-size: 1rem;
+}
+
+#formationsTable th {
+  background-color: #f9f9f9;
+  color: #0077cc;
+  font-weight: bold;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+#formationsTable td {
+  background-color: #ffffff;
+  color: #333333;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+#formationsTable tr:hover {
+  background-color: #f4f4f4;
+}
+
+/* Buttons in Table */
+#formationsTable .edit-formation,
+#formationsTable .delete-formation {
+  background-color: #f49f42;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#formationsTable .edit-formation:hover {
+  background-color: #e88d34;
+}
+
+#formationsTable .delete-formation:hover {
+  background-color: #d47328;
+}
+
+/* Logout Button */
+#logoutButton {
+  background-color: #f44336;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  align-self: flex-end;
+  margin-top: 10px;
+}
+
+#logoutButton:hover {
+  background-color: #d32f2f;
+}
+
+/* Modal Background */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+}
+
+.modal-content h3 {
+  font-size: 1.5rem;
+  color: #0077cc;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.modal-content label {
+  display: block;
+  font-size: 1rem;
+  color: #333333;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  font-size: 1rem;
+  margin-bottom: 15px;
+}
+
+.modal-content input:focus {
+  border-color: #0077cc;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 119, 204, 0.5);
+}
+
+.modal-content .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-content .submit-button {
+  background-color: #0077cc;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content .submit-button:hover {
+  background-color: #005fa3;
+}
+
+.modal-content .cancel-button {
+  background-color: #f44336;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content .cancel-button:hover {
+  background-color: #d32f2f;
+}
+
+
+
+@media (max-width: 1300px) {
+  .about-container,
+  .services-container,
+  .contact-container {
+    width: 90%;
   }
-  
-  .appointment-container {
-    display: flex;
-    border-left: 4px solid #f49f42;
+
+  .CCbody-container{
+    width: 85%;
+  }
+}
+
+/* Media Queries for Tablets (768px and below) */
+@media (max-width: 900px) {
+  body{
+    height: 100%;
+  }
+
+  .CampusCandorContainer {
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 45%;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);  
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 15px;
   }
 
-  .appointment-title {
-    font-size: 32px;
-    width: 600px;
-    font-weight: bold;
-    color: #0077cc;
-    text-align: left;
-    margin-bottom: 20px;
-  }
-  
-  .appointment-description {
-    font-size: 16px;
-    width: 600px;
-    text-align: left;
-    margin-bottom: 30px;
-    color: #555;
-  }
-  
-  .appointment-form {
-    width: 600px;
-    margin: 0 auto;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #333;
-  }
-  
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  input[type="date"],
-  textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    font-size: 16px;
-    box-sizing: border-box;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
-  
-  input:focus,
-  textarea:focus {
-    border-color: #0077cc;
-    outline: none;
-    box-shadow: 0px 0px 5px rgba(0, 77, 153, 0.5);
-  }
-  
-  textarea {
-    resize: none;
-    min-height: 100px;
-  }
-  
-  .submit-button {
-    width: 100%;
-    background-color: #0077cc;
-    color: white;
-    font-size: 18px;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .submit-button:hover {
-    background-color: #005fa3;
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .appointment-section {
-      padding: 20px;
-    }
-  
-    .appointment-title {
-      font-size: 28px;
-    }
-  
-    .appointment-description {
-      font-size: 14px;
-    }
-  }
-  
-  
-
-/* Section Responsive */
-@media (max-width: 768px) {
   .header {
+    height: auto;
     flex-direction: column;
-    align-items: flex-start;
-    padding: 20px;
+    align-items: center;
+  }
+
+  .CampusLogo{
+    margin-left: 0px;
   }
 
   .menu {
-    flex-direction: column;
-    margin-top: 15px;
+    font-weight: 700;
+    background-color: #f49f42;
+    width: 100%;
+    justify-content: space-evenly;
+    margin: 0;
   }
 
-  .menu-item {
-    margin-left: 0;
-    margin-top: 10px;
+  .CCbody-container {
+    width: 90%;
+    height: 60%;
+    padding: 0 30px;
+  }
+
+  .CCbody-content {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .CCbody-image {
+    display: none;
+  }
+
+  .about-container,
+  .services-container,
+  .contact-container {
+    width: 90%;
+  }
+
+  .services-list {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  }
+
+  .contact-details {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .back-button{
+    display: none;
+  }
+  
+  .formation-container{
+    height: fit-content;
+    justify-content: center;
   }
 
   .formation-section {
+    width: 80%;
+    margin-bottom: 20px;
     padding: 20px;
   }
 
-  .formation-title {
-    font-size: 28px;
+  .appointment-container {
+    width: 80%;
+  }
+}
+
+/* Media Queries for Phones (480px and below) */
+@media (max-width: 510px) {
+  body {
+    height: auto;
+    font-size: 14px; /* Smaller font size for small screens */
   }
 
-  .formation-description {
-    font-size: 16px;
+  .notification-popup{
+    width: 70%;
+    bottom:20px;
+    right: 20px;
   }
 
-  .formation-button {
-    font-size: 16px;
+  .header h1 {
+    font-size: 1.2rem;
+    padding: 10px;
+  }
+
+  .header-container {
+    flex-direction: column;
+  }
+
+  .menu a {
+    padding: 5px;
+  }
+
+  #universityHAT {
+    display: none;
+  }
+
+    .CCbody-container {
+    border: none;
+    width: 100%;
+    border-radius: 0;
+    height: 100%;
+    padding: 0px;
+  }
+
+  .goToForm{
     padding: 10px 20px;
+    font-size: 1rem;
   }
+
+  .CCbody-content {
+    padding: 20px;
+    width: 100%;
+  }
+
+
+  .CCbody-title {
+    font-size: 2.5rem;
+  }
+
+  .CCbody-text {
+    font-size: 1.2rem;
+  }
+
+  .services-list {
+    grid-template-columns: 1fr; /* 1 column */
+  }
+
+  .about-container {
+    width: 100%;
+  }
+
+  .services-container{
+    width: 100%;
+  }
+
+  .contact-container{
+    width: 100%;
+  }
+
+  .contact-item {
+    padding: 15px;
+  }
+
+  .formation-container{
+    background: none;
+    background-color: #ffffff;
+    box-shadow: none;
+    height: 100%;
+  }
+
+  .formation-section {
+    margin: 0;
+    width: 90%;
+    padding: 20px 0 20px 0;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+  }
+
+
+  .appointment-title,
+  .appointment-description {
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  .appointment-form {
+    width: 100%;
+  }
+}
+
+footer {
+  font-size: 12px;
+  padding: 15px;
 }
