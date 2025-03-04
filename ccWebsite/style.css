@@ -486,8 +486,10 @@ footer {
   display: none;
   align-items: center;
   justify-content: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
   width: 100%;
-  height: 90vh;
+  height: fit-content;
   background: linear-gradient(to right, #66a1b4, #ffffff);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
@@ -637,25 +639,35 @@ textarea {
 }
 
 .admin-container {
-  max-width: 900px;
-  width: 100%;
+  width: 95%;
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
-  border-radius: 10px;
+  border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 15px;
 }
 
 .admin-container h2 {
-  font-size: 2rem;
-  color: #0077cc;
-  margin-bottom: 20px;
-  text-align: center;
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+#addFormationButton{
+  width: 300px;
+  background-color: #0077cc;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .formation-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-bottom: 20px;
 }
 
@@ -673,12 +685,12 @@ textarea {
 .formation-actions button:hover {
   background-color: #005fa3;
 }
-
-/* Table Styles */
+/* Styles pour le tableau de formations */
 #formationsTable {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 #formationsTable th,
@@ -686,49 +698,80 @@ textarea {
   text-align: left;
   padding: 12px;
   font-size: 1rem;
+  border: 1px solid #ddd;
 }
 
-#formationsTable th {
-  background-color: #f9f9f9;
+#formationsTable thead th {
+  background-color: #f2f2f2;
   color: #0077cc;
   font-weight: bold;
-  border-bottom: 2px solid #e0e0e0;
 }
 
-#formationsTable td {
+#formationsTable tbody td {
   background-color: #ffffff;
   color: #333333;
-  border-bottom: 1px solid #e0e0e0;
 }
 
-#formationsTable tr:hover {
+#formationsTable tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#formationsTable tbody tr:hover {
   background-color: #f4f4f4;
 }
 
-/* Buttons in Table */
+/* Boutons d'action dans le tableau */
 #formationsTable .edit-formation,
 #formationsTable .delete-formation {
-  background-color: #f49f42;
-  color: #ffffff;
-  border: none;
-  border-radius: 5px;
   padding: 8px 12px;
   font-size: 0.9rem;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  color: #fff;
+}
+
+#formationsTable .edit-formation {
+  background-color: #0077cc;
+}
+
+#formationsTable .delete-formation {
+  background-color: #d9534f;
 }
 
 #formationsTable .edit-formation:hover {
-  background-color: #e88d34;
+  background-color: #005fa3;
 }
 
 #formationsTable .delete-formation:hover {
-  background-color: #d47328;
+  background-color: #c9302c;
+}
+
+.clickable-date{
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.3s;
+  color: black;
+}
+
+.clickable-date:hover{
+  opacity: 0.8;
+}
+
+.ID-FOR{
+  width: 20px;
+}
+
+.Actions-FOR{
+  width: 250px;
 }
 
 /* Logout Button */
 #logoutButton {
-  background-color: #f44336;
+  width: 300px;
+  background-color: #ff0000;
   color: #ffffff;
   border: none;
   border-radius: 5px;
@@ -736,8 +779,6 @@ textarea {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  align-self: flex-end;
-  margin-top: 10px;
 }
 
 #logoutButton:hover {
@@ -752,7 +793,7 @@ textarea {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 1000;
@@ -1027,6 +1068,279 @@ textarea {
   .appointment-form {
     width: 100%;
   }
+}
+
+#formationSelect{
+  width: 100%;
+  padding: 10px;
+  border: none;
+  color: white;
+  background-color: #0077cc;
+  border-radius: 10px;
+  font-size: 16px;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    transition: all 0.3s;
+}
+
+#formationSelect:hover{
+  background-color: #005fa3;
+  cursor: pointer;
+}
+
+#formationSelect option{
+  background-color: #005fa3;
+  color: white;
+}
+
+#dateSelect{
+  width: 100%;
+  padding: 10px;
+  border: none;
+  color: white;
+  background-color: #0077cc;
+  border-radius: 10px;
+  font-size: 16px;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    transition: all 0.3s;
+}
+
+#dateSelect:hover{
+  background-color: #005fa3;
+  cursor: pointer;
+}
+
+.btn-add{
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-add:hover{
+  background-color: #005fa3;
+}
+
+.btn-remove{
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-remove:hover{
+  background-color: #d32f2f;
+}
+/* Conteneur global du bloc des demandes */
+#pendingRequests {
+  margin-top: 20px;
+  font-family: Arial, sans-serif;
+  background: #fff;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 95%;
+}
+
+/* Titre du bloc */
+#pendingRequests h3 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Style du tableau */
+#pendingRequestsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* En-tête du tableau */
+#pendingRequestsTable thead th {
+  background-color: #f8f8f8;
+  color: #0077cc;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-weight: bold;
+}
+
+/* Corps du tableau */
+#pendingRequestsTable tbody td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+/* Lignes alternées */
+#pendingRequestsTable tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Effet hover sur une ligne */
+#pendingRequestsTable tbody tr:hover {
+  background-color: #e9e9e9;
+}
+
+/* Boutons d'action dans le tableau */
+#pendingRequestsTable button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s ease;
+}
+
+#pendingRequestsTable button.btn-accept {
+  background-color: #28a745;
+  color: #fff;
+  width: 100%;
+}
+
+#pendingRequestsTable button.btn-refuse {
+  background-color: #dc3545;
+  color: #fff;
+  width: 100%;
+  margin-top: 10px;
+}
+
+#pendingRequestsTable button:hover {
+  opacity: 0.9;
+}
+
+.employeesList{
+  font-size: 15px;
+  width: fit-content;
+}
+
+/* Modal de confirmation */
+#confirmModal2 {
+  display: none; /* caché par défaut */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5); /* fond semi-transparent */
+}
+
+#confirmModal2 .modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+#confirmModal2 .modal-actions {
+  margin-top: 20px;
+}
+
+#confirmModal2 .modal-actions button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+#confirmModal2 .btn-yes {
+  width: 100px;
+  background-color: #d9534f;
+  color: #fff;
+}
+
+#confirmModal2 .btn-yes:hover {
+  background-color: #c9302c;
+}
+
+#confirmModal2 .btn-no {
+  width: 100px;
+  background-color: #0077cc;
+  color: #fff;
+}
+
+#confirmModal2 .btn-no:hover {
+  background-color: #005fa3;
+}
+
+modal2-title{
+  font-size: 1.5rem;
+  color: #0077cc;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Modal Participants */
+#participantsModal {
+  display: none;
+  position: fixed;
+  z-index: 1100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+#participantsModal .modal-content {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 0px 20px 20px 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 8px;
+  position: relative;
+}
+#participantsModal .close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #aaa;
+}
+#participantsModal .close-button:hover {
+  color: #000;
+}
+#participantsModal h3 {
+  display: flex;
+  font-size: 1.3rem;
+  margin-top: 0;
+  color: #333;
+}
+#participantsModal #participantsList {
+  margin-top: 15px;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+#modalDate{
+  color: #f49f42;
 }
 
 footer {

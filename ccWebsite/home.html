@@ -39,7 +39,7 @@
                 apprendre et se perfectionner sur les différents métiers
                 existants dans le monde de la <strong>propreté</strong>.
               </p>
-              <div class="goToForm">Prenez un rendez-vous</div>
+              <div class="goToForm">Participer à une formation</div>
             </div>
             <div class="CCbody-image"></div>
           </div>
@@ -370,7 +370,7 @@
         </ul>
         <h2>Durée de la formation</h2>
         <p>
-          <strong>7</strong> Heures soit <strong>1</strong> jours de formation.
+          <strong>7</strong> Heures soit <strong>1</strong> jour de formation.
         </p>
         <h2>Public cible</h2>
         <p>
@@ -410,7 +410,7 @@
         </ul>
         <h2>Durée de la formation</h2>
         <p>
-          <strong>7</strong> Heures soit <strong>1</strong> jours de formation.
+          <strong>7</strong> Heures soit <strong>1</strong> jour de formation.
         </p>
         <h2>Public cible</h2>
         <p>
@@ -454,7 +454,7 @@
         </ul>
         <h2>Durée de la formation</h2>
         <p>
-          <strong>7</strong> Heures soit <strong>1</strong> jours de formation.
+          <strong>7</strong> Heures soit <strong>1</strong> jour de formation.
         </p>
         <h2>Public cible</h2>
         <p>
@@ -612,7 +612,7 @@
     </div>
     <div id="appointment-section">
       <div class="appointment-container">
-        <h1 class="appointment-title">Prenez un rendez-vous</h1>
+        <h1 class="appointment-title">Participer à une formation</h1>
         <p class="appointment-description">
           Merci de remplir le formulaire ci-dessous pour prendre un rendez-vous
           avec notre équipe. Nous vous contacterons dès que possible pour
@@ -653,10 +653,49 @@
             />
           </div>
 
+          <!-- Nouvelle sélection de formation -->
           <div class="form-group">
-            <label for="date">Date souhaitée:</label>
-            <input type="date" id="date" name="date" required />
+            <label for="formationSelect">Formation:</label>
+            <select id="formationSelect" name="formation" required>
+              <!-- Les options seront injectées via JS -->
+            </select>
           </div>
+
+          <!-- Sélection de date qui dépend de la formation choisie -->
+          <div class="form-group">
+            <label for="dateSelect">Date proposée:</label>
+            <select id="dateSelect" name="date" required>
+              <!-- Les dates disponibles seront injectées via JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Liste des participants (12 max) :</label>
+            <div class="employee-table">
+              <table id="employeeTable">
+                <thead>
+                  <tr>
+                    <th>MATRICULE</th>
+                    <th>NOM / PRÉNOM</th>
+                    <th>ENTITÉ</th>
+                    <th>Ajouter/Retirer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="employee-row">
+                    <td><input type="text" name="matricule[]" placeholder="Matricule" required /></td>
+                    <td><input type="text" name="nameEmployee[]" placeholder="Nom / Prénom" required /></td>
+                    <td><input type="text" name="entity[]" placeholder="Entité" required /></td>
+                    <td>
+                      <button type="button" class="btn-add">+</button>
+                      <button type="button" class="btn-remove" disabled>-</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
 
           <div class="form-group">
             <label for="message">Message:</label>
@@ -712,28 +751,53 @@
         </form>
       </div>
     </div>
-    <div id="adminPanel" style="display: none;">
+    <div id="adminPanel" style="display: none">
       <div class="admin-container">
         <h2>Gestion des Formations</h2>
-        <button id="logoutButton" class="submit-button">Déconnexion</button>
         <div class="formation-actions">
           <button id="addFormationButton" class="submit-button">Ajouter une Formation</button>
+          <button id="logoutButton" class="submit-button">Déconnexion</button>
         </div>
         <table id="formationsTable" border="1">
           <thead>
             <tr>
-              <th>ID</th>
+              <th class="ID-FOR">ID</th>
               <th>Nom</th>
               <th>Dates Disponibles</th>
-              <th>Actions</th>
+              <th class="Actions-FOR">Actions</th>
             </tr>
           </thead>
           <tbody>
             <!-- Dynamic rows will be added here -->
           </tbody>
         </table>
+        
       </div>
-      <div id="formationModal" class="modal" style="display: none;">
+      <!-- Nouveau bloc pour les demandes en attente -->
+      <div id="pendingRequests" style="margin-top: 20px;">
+        <h3>Demandes en attente</h3>
+        <table id="pendingRequestsTable" border="1">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Manager</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Formation</th>
+              <th>Date</th>
+              <th>Message</th>
+              <th>Employees</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Les lignes seront générées dynamiquement -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+      <div id="formationModal" class="modal" style="display: none">
         <div class="modal-content">
           <h3 id="modalTitle">Ajouter une Formation</h3>
           <form id="formationForm">
@@ -759,13 +823,33 @@
             </div>
             <div class="form-actions">
               <button type="submit" class="submit-button">Enregistrer</button>
-              <button type="button" class="cancel-button" id="closeModal">Annuler</button>
+              <button type="button" class="cancel-button" id="closeModal">
+                Annuler
+              </button>
             </div>
           </form>
         </div>
       </div>
+      <div id="confirmModal2" class="modal">
+        <div class="modal-content">
+          <h3 class="modal2-title">Supprimer une formation</h3>
+          <p id="confirmMessage2">Voulez-vous vraiment supprimer cette formation ?</p>
+          <div class="modal-actions">
+            <button id="confirmYes2" class="btn-yes">Oui</button>
+            <button id="confirmNo2" class="btn-no">Annuler</button>
+          </div>
+        </div>
+      </div>
+      <div id="participantsModal" class="modal">
+        <div class="modal-content">
+          <span id="closeParticipantsModal" class="close-button">&times;</span>
+          <h2 id="formation-name-modal"></h2>
+          <h3>Participants pour la date (<span id="modalDate"></span>)</h3>
+          <div id="participantsList"></div>
+        </div>
+      </div>
       
-    </div>    
+    </div>
     <script
       type="text/javascript"
       src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"
