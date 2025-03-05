@@ -1,22 +1,126 @@
 // URL de votre Web App Google Apps Script
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbyF0C68Cm-EHEajSaN8IlHcZyClzFCfzKrjmswptmxVj-bl1KsCsj2XKtficWs9uPJ6Eg/exec";
+  "https://script.google.com/macros/s/AKfycbxGBnMJYLQyqbTuQuQ42zsyUN8P8Of36gLaFWbFm8fPZqEEtMVEDjQnZucte11GlpBaTg/exec";
 
+// ---------------------- Fonctions Utilitaires Globales ----------------------
+
+// Convertit une chaîne "dd/mm/yyyy" en objet Date
+function parseDDMMYYYY(dateStr) {
+  const parts = dateStr.split("/");
+  return new Date(parts[2], parts[1] - 1, parts[0]);
+}
+
+// Compare deux dates (objets Date) sur l'année, le mois et le jour uniquement
+function isSameDate(date1, date2) {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
+// Convertit une date "dd/mm/yyyy" en sa représentation complète attendue par le Sheet
+function convertDDMMYYYYToFull(dateStr) {
+  const d = parseDDMMYYYY(dateStr);
+  return d.toString();
+}
+
+// - Otherwise, if it contains a "T" (ISO format), parse accordingly.
+function formatDateToDDMMYYYY(dateStr) {
+  // If already in dd/mm/yyyy format, return as is.
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+    return dateStr;
+  }
+  // If it appears to be an ISO date or similar (contains "T"), parse it:
+  if (dateStr.indexOf("T") !== -1) {
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    const dd = d.getDate().toString().padStart(2, "0");
+    const mm = (d.getMonth() + 1).toString().padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }
+  // Otherwise, try to parse assuming it's in dd/mm/yyyy but maybe not well formatted.
+  const d = parseDDMMYYYY(dateStr);
+  if (isNaN(d)) return dateStr;
+  const dd = d.getDate().toString().padStart(2, "0");
+  const mm = (d.getMonth() + 1).toString().padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+// Helper: Convert a dd/mm/yyyy string back to a full date string (via Date.toString())
+function convertDDMMYYYYToFull(dateStr) {
+  const parts = dateStr.split("/");
+  if (parts.length !== 3) return dateStr; // if not in dd/mm/yyyy, return as is
+  const d = new Date(parts[2], parts[1] - 1, parts[0]);
+  return d.toString();
+}
+
+// Retourne un tableau d'objets représentant chaque bloc de participants
+function getBlocks(participantsStr) {
+  const regex = /(\[.*?\])\s*\((.*?)\)/g;
+  let blocks = [];
+  let match;
+  while ((match = regex.exec(participantsStr)) !== null) {
+    blocks.push({
+      json: match[1],
+      date: match[2],
+      fullBlock: match[0],
+    });
+  }
+  return blocks;
+}
+
+const contactItems = document.querySelectorAll(".contact-item");
+const notificationPopup = document.getElementById("notificationPopup");
+
+const showNotification = (message) => {
+  const notifText = notificationPopup.querySelector("p");
+  if (notifText) notifText.textContent = message;
+  notificationPopup.classList.add("show");
+  notificationPopup.classList.remove("hidden");
+  setTimeout(() => {
+    notificationPopup.classList.add("hidden");
+    notificationPopup.classList.remove("show");
+  }, 3000);
+};
+
+// Compte le nombre total de participants pour une formation à une date donnée
+function getParticipantsCount(formation, date) {
+  let count = 0;
+  if (formation.participants) {
+    const regex = /(\[.*?\])\s*\((.*?)\)/g;
+    let match;
+    const targetDate = parseDDMMYYYY(date);
+    while ((match = regex.exec(formation.participants)) !== null) {
+      try {
+        let storedDate = new Date(match[2]);
+        if (isSameDate(storedDate, targetDate)) {
+          const empData = JSON.parse(match[1]);
+          // Chaque bloc contient un tableau d'un objet
+          let empArray = Array.isArray(empData) ? empData : [empData];
+          count += empArray.length;
+        }
+      } catch (e) {
+        console.error("Erreur lors du parsing des participants:", e);
+      }
+    }
+  }
+  return count;
+}
+
+// ---------------------- Début du Script ----------------------
 document.addEventListener("DOMContentLoaded", () => {
-  // Module Notifications
   const notify = initNotifications();
-
-  // Module Navigation
   initNavigation();
-
-  // Module Panneau Admin
   initAdminPanel();
-
-  // Module Formulaire de Rendez-vous
   initAppointmentForm(notify);
-
-  // Initialisation du tableau dynamique pour les employés
   initEmployeeTable();
+  // Launch the archive process when the DOM is loaded
+  runArchiveProcess();
+  // Then refresh the Historique panel
+  fetchArchives();
 });
 
 /* =================== Navigation =================== */
@@ -166,10 +270,8 @@ function initAdminPanel() {
   const formationsTable = document
     .getElementById("formationsTable")
     .querySelector("tbody");
-  // Le tableau des demandes sera généré dynamiquement dans la section "pendingRequests"
   const formationModal = document.getElementById("formationModal");
   const modalTitle = document.getElementById("modalTitle");
-  const formationForm = document.getElementById("formationForm");
   const formationNameInput = document.getElementById("formationName");
   const formationDatesInput = document.getElementById("formationDates");
   const closeModalButton = document.getElementById("closeModal");
@@ -213,6 +315,7 @@ function initAdminPanel() {
       );
     }
   };
+  window.fetchFormations = fetchFormations; // Exposer globalement
 
   const addFormationToSheet = async (name, dates) => {
     const newId =
@@ -264,54 +367,28 @@ function initAdminPanel() {
     }
   };
 
-  // Fonction de calcul du nombre de participants pour une formation à une date donnée
-  function getParticipantsCount(formation, date) {
-    let count = 0;
-    if (formation.participants) {
-      const regex = /(\[.*?\])\s*\((.*?)\)/g;
-      let match;
-      while ((match = regex.exec(formation.participants)) !== null) {
-        try {
-          let parsedDate = new Date(match[2]);
-          let dd = parsedDate.getDate().toString().padStart(2, "0");
-          let mm = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
-          let yyyy = parsedDate.getFullYear();
-          let formattedParticipantDate = `${dd}/${mm}/${yyyy}`;
-          if (formattedParticipantDate === date) {
-            const empData = JSON.parse(match[1]);
-            let empArray = Array.isArray(empData) ? empData : [empData];
-            count += empArray.length;
-          }
-        } catch (e) {
-          console.error("Erreur lors du parsing des participants:", e);
-        }
-      }
-    }
-    return count;
-  }
-
   // --- Affichage des formations ---
   const renderFormations = () => {
     formationsTable.innerHTML = "";
     formationsData.forEach((formation) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-          <td>${formation.id}</td>
-          <td>${formation.name}</td>
-          <td>${
-            formation.availableDates
-              ? renderAvailableDates(formation.availableDates, formation)
-              : ""
-          }</td>
-          <td>
-            <button class="edit-formation" data-id="${
-              formation.id
-            }">Modifier</button>
-            <button class="delete-formation" data-id="${
-              formation.id
-            }">Supprimer</button>
-          </td>
-        `;
+        <td>${formation.id}</td>
+        <td>${formation.name}</td>
+        <td>${
+          formation.availableDates
+            ? renderAvailableDates(formation.availableDates, formation)
+            : ""
+        }</td>
+        <td>
+          <button class="edit-formation" data-id="${
+            formation.id
+          }">Modifier</button>
+          <button class="delete-formation" data-id="${
+            formation.id
+          }">Supprimer</button>
+        </td>
+      `;
       formationsTable.appendChild(row);
     });
     // Attacher l'événement sur les dates cliquables
@@ -329,28 +406,20 @@ function initAdminPanel() {
     });
   };
 
-  // Pour le panel admin, les dates cliquables affichent également le nombre de participants sur 12
   function renderAvailableDates(datesStr, formation) {
     if (!datesStr) return "";
     let dates = datesStr.split(",");
     return dates
       .map((d) => {
         let trimmed = d.trim();
-        let dateObj = new Date(trimmed);
-        let formatted = isNaN(dateObj)
-          ? trimmed
-          : `${dateObj.getDate().toString().padStart(2, "0")}/${(
-              dateObj.getMonth() + 1
-            )
-              .toString()
-              .padStart(2, "0")}/${dateObj.getFullYear()}`;
-        let count = getParticipantsCount(formation, formatted);
-        // Définir la couleur selon le nombre de participants
-        let color = "#3333"; // gris par défaut (0)
-        if (count > 0 && count < 12) {
-          color = "#FFA500"; // orange
-        } else if (count === 12) {
-          color = "#37ec5f"; // vert
+        // Use our helper to ensure the date is formatted as dd/mm/yyyy
+        let formatted = formatDateToDDMMYYYY(trimmed);
+        let count = formation ? getParticipantsCount(formation, formatted) : 0;
+        let color = "#3333";
+        if (count > 0 && count < 6) {
+          color = "#FFA500";
+        } else if (count >= 6) {
+          color = "#37ec5f";
         }
         return `<span class="clickable-date" data-formation-id="${formation.id}" data-date="${formatted}" style="cursor:pointer; margin-right:5px; background-color:${color};">${formatted} (${count}/12)</span>`;
       })
@@ -507,14 +576,21 @@ function initAdminPanel() {
         }
       });
   }
-
-  // --- Modal Formation ---
+  /* --- Modal Formation --- */
   let isEditing = false;
   let editingFormationId = null;
   const showModal = (title, formation = null) => {
     modalTitle.textContent = title;
     formationNameInput.value = formation ? formation.name : "";
-    formationDatesInput.value = formation ? formation.availableDates : "";
+    if (formation && formation.availableDates) {
+      // Split the availableDates string by comma, trim each one, then format.
+      formationDatesInput.value = formation.availableDates
+        .split(",")
+        .map((date) => formatDateToDDMMYYYY(date.trim()))
+        .join(", ");
+    } else {
+      formationDatesInput.value = "";
+    }
     isEditing = !!formation;
     editingFormationId = formation ? formation.id : null;
     formationModal.style.display = "flex";
@@ -558,9 +634,15 @@ function initAdminPanel() {
     showModal("Ajouter une Formation");
   });
 
+  // On submit, we assume the user’s input is in "dd/mm/yyyy" format
   formationForm.addEventListener("submit", async (e) => {
+    showNotification("Enregistrement en cours, veuillez patienter..");
+    setTimeout(() => {
+      showNotification("Formation enregistrée avec succès !");
+    }, 4000);
     e.preventDefault();
     const name = formationNameInput.value.trim();
+    // Here, we assume the availableDates should be stored in dd/mm/yyyy format.
     const dates = formationDatesInput.value.split(",").map((d) => d.trim());
     if (isEditing) {
       await updateFormationInSheet(editingFormationId, name, dates);
@@ -583,38 +665,43 @@ function initAdminPanel() {
         "Êtes-vous sûr de vouloir supprimer cette formation ?"
       );
       if (ok) {
+        showNotification("Suppression en cours, veuillez patienter..");
+        setTimeout(() => {
+          showNotification("Formation supprimée avec succès !");
+        }, 4000);
         await deleteFormationFromSheet(id);
       }
     }
   });
 }
 
-/* =================== Modal de Confirmation Personnalisé =================== */
 function customConfirm(message) {
   return new Promise((resolve) => {
     const modal = document.getElementById("confirmModal2");
     const confirmMessage = document.getElementById("confirmMessage2");
+    const btnYes = document.getElementById("confirmYes2");
+    const btnNo = document.getElementById("confirmNo2");
+
     confirmMessage.textContent = message;
     modal.style.display = "block";
 
-    function closeModal(answer) {
+    function cleanUp() {
       modal.style.display = "none";
-      document
-        .getElementById("confirmYes2")
-        .removeEventListener("click", onYes);
-      document.getElementById("confirmNo2").removeEventListener("click", onNo);
-      resolve(answer);
+      btnYes.removeEventListener("click", onYes);
+      btnNo.removeEventListener("click", onNo);
     }
 
     function onYes() {
-      closeModal(true);
+      cleanUp();
+      resolve(true);
     }
     function onNo() {
-      closeModal(false);
+      cleanUp();
+      resolve(false);
     }
 
-    document.getElementById("confirmYes2").addEventListener("click", onYes);
-    document.getElementById("confirmNo2").addEventListener("click", onNo);
+    btnYes.addEventListener("click", onYes);
+    btnNo.addEventListener("click", onNo);
   });
 }
 
@@ -627,33 +714,42 @@ function showParticipantsModal(formation, date) {
   modalDate.textContent = date;
   modalTitle.textContent = formation.name;
 
-  let participants = [];
-  if (formation.participants) {
-    // Extraction de chaque bloc au format : [JSON] (date)
-    const regex = /(\[.*?\])\s*\((.*?)\)/g;
-    let match;
-    while ((match = regex.exec(formation.participants)) !== null) {
-      try {
-        const empData = JSON.parse(match[1]);
-        let parsedDate = new Date(match[2]);
-        let dd = parsedDate.getDate().toString().padStart(2, "0");
-        let mm = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
-        let yyyy = parsedDate.getFullYear();
-        let formattedParticipantDate = `${dd}/${mm}/${yyyy}`;
-        if (formattedParticipantDate === date) {
-          let empArray = Array.isArray(empData) ? empData : [empData];
-          participants = participants.concat(empArray);
-        }
-      } catch (e) {
-        console.error("Erreur lors du parsing des participants:", e);
+  // Extraction de tous les blocs pour la date concernée
+  const regex = /(\[.*?\])\s*\((.*?)\)/g;
+  let blocks = [];
+  let match;
+  const targetDate = parseDDMMYYYY(date);
+  while ((match = regex.exec(formation.participants)) !== null) {
+    try {
+      let storedDate = new Date(match[2]);
+      if (isSameDate(storedDate, targetDate)) {
+        blocks.push(match[0]);
       }
+    } catch (e) {
+      console.error("Erreur lors du parsing des blocs :", e);
     }
   }
 
+  // Pour l'affichage, on reconstitue la liste des employés à partir de chaque bloc
+  let participants = [];
+  blocks.forEach((block) => {
+    const m = block.match(/(\[.*?\])\s*\((.*?)\)/);
+    if (m && m[1]) {
+      try {
+        const empData = JSON.parse(m[1]);
+        let empArray = Array.isArray(empData) ? empData : [empData];
+        participants = participants.concat(empArray);
+      } catch (e) {
+        console.error("Erreur lors du parsing d'un bloc :", e);
+      }
+    }
+  });
+
+  let htmlContent = "";
   if (participants.length === 0) {
-    participantsList.innerHTML = "<p>Aucun participant pour cette date.</p>";
+    htmlContent += "<p>Aucun participant pour cette date.</p>";
   } else {
-    let tableHTML = `
+    htmlContent += `
       <table style="width:100%; border-collapse:collapse;">
         <thead>
           <tr style="background-color:#f9f9f9;">
@@ -661,36 +757,178 @@ function showParticipantsModal(formation, date) {
             <th style="padding:8px; border:1px solid #ddd;">Matricule</th>
             <th style="padding:8px; border:1px solid #ddd;">Nom/Prenom</th>
             <th style="padding:8px; border:1px solid #ddd;">Entité</th>
+            <th style="padding:8px; border:1px solid #ddd;">Action</th>
           </tr>
         </thead>
         <tbody>
     `;
-    participants.forEach((emp, index) => {
-      tableHTML += `
-        <tr>
-          <td style="padding:8px; border:1px solid #ddd;">${index + 1}</td>
-          <td style="padding:8px; border:1px solid #ddd;">${emp.matricule}</td>
-          <td style="padding:8px; border:1px solid #ddd;">${
-            emp.nameEmployee
-          }</td>
-          <td style="padding:8px; border:1px solid #ddd;">${emp.entity}</td>
-        </tr>
-      `;
+    // Affichage dans l'ordre des blocs (chaque bloc correspond à un ajout)
+    let blockList = getBlocks(formation.participants).filter((b) => {
+      let d = new Date(b.date);
+      return isSameDate(d, targetDate);
     });
-    tableHTML += `
+    blockList.forEach((block, index) => {
+      try {
+        const empData = JSON.parse(block.json);
+        // Chaque bloc est un tableau contenant un seul objet
+        const emp = Array.isArray(empData) ? empData[0] : empData;
+        htmlContent += `
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">${index + 1}</td>
+            <td style="padding:8px; border:1px solid #ddd;">${
+              emp.matricule
+            }</td>
+            <td style="padding:8px; border:1px solid #ddd;">${
+              emp.nameEmployee
+            }</td>
+            <td style="padding:8px; border:1px solid #ddd;">${emp.entity}</td>
+            <td style="padding:8px; border:1px solid #ddd;">
+              <button class="btn-remove-participant" data-index="${index}">Retirer</button>
+            </td>
+          </tr>
+        `;
+      } catch (e) {
+        console.error("Erreur lors de l'affichage d'un bloc :", e);
+      }
+    });
+    htmlContent += `
         </tbody>
       </table>
     `;
-    participantsList.innerHTML = tableHTML;
   }
 
-  modal.style.display = "block";
+  // Section d'ajout manuel d'un participant
+  htmlContent += `
+    <div id="addParticipantSection" style="margin-top:15px;">
+      <h4>Ajouter un participant</h4>
+      <input type="text" id="newMatricule" placeholder="Matricule" style="margin-right:5px;" />
+      <input type="text" id="newName" placeholder="Nom/Prénom" style="margin-right:5px;" />
+      <input type="text" id="newEntity" placeholder="Entité" style="margin-right:5px;" />
+      <button id="btnAddParticipant">Ajouter participant(e)</button>
+    </div>
+  `;
+
+  participantsList.innerHTML = htmlContent;
+  modal.style.display = "flex";
+
+  // Gestion de l'ajout d'un participant
+  document.getElementById("btnAddParticipant").addEventListener("click", () => {
+    showNotification("Ajout en cours, veuillez patienter..");
+    const matricule = document.getElementById("newMatricule").value.trim();
+    const nameEmployee = document.getElementById("newName").value.trim();
+    const entity = document.getElementById("newEntity").value.trim();
+    if (!matricule || !nameEmployee || !entity) {
+      alert("Veuillez remplir tous les champs");
+      return;
+    }
+    const newParticipant = { matricule, nameEmployee, entity };
+    addParticipantToFormation(formation, date, newParticipant);
+    setTimeout(() => {
+      showNotification("Participant ajouté avec succès !");
+    }, 4000);
+  });
+
+  // Gestion de la suppression d'un participant
+  document.querySelectorAll(".btn-remove-participant").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      showNotification("Effacement en cours, veuillez patienter..");
+      const index = parseInt(btn.getAttribute("data-index"));
+      removeParticipantFromFormation(formation, date, index);
+      setTimeout(() => {
+        showNotification("Participant retiré avec succès !");
+      }, 4000);
+    });
+  });
 }
+
 document
   .getElementById("closeParticipantsModal")
   .addEventListener("click", () => {
     document.getElementById("participantsModal").style.display = "none";
   });
+
+/* ---------------------- Ajout / Suppression de Participant ---------------------- */
+
+// Lorsqu'on ajoute un participant, on crée un nouveau bloc au format souhaité
+async function addParticipantToFormation(formation, date, newParticipant) {
+  const fullDateStr = convertDDMMYYYYToFull(date);
+  const newBlock = JSON.stringify([newParticipant]) + " (" + fullDateStr + ")";
+  if (formation.participants && formation.participants.trim().length > 0) {
+    formation.participants = formation.participants.trim() + ", " + newBlock;
+  } else {
+    formation.participants = newBlock;
+  }
+  await updateFormationParticipantsInSheet(
+    formation.id,
+    formation.participants
+  );
+  showParticipantsModal(formation, date);
+}
+
+// Lorsqu'on supprime, on reconstruit la chaîne en supprimant le bloc ciblé
+async function removeParticipantFromFormation(formation, date, index) {
+  // Extraire tous les blocs existants
+  let blocks = getBlocks(formation.participants);
+  let newBlocks = [];
+  let currentDateIndex = 0;
+  const targetDate = parseDDMMYYYY(date);
+
+  // Fonction utilitaire pour s'assurer qu'un bloc se termine par ")"
+  function fixBlock(blockStr) {
+    blockStr = blockStr.trim();
+    return blockStr.endsWith("))") ? blockStr : blockStr + ")";
+  }
+
+  // Parcourir tous les blocs
+  for (let i = 0; i < blocks.length; i++) {
+    let block = blocks[i];
+    let blockDate = new Date(block.date);
+    if (isSameDate(blockDate, targetDate)) {
+      // Pour les blocs de la date cible, on ne garde que ceux qui ne correspondent pas à l'index à supprimer
+      if (currentDateIndex !== index) {
+        newBlocks.push(fixBlock(block.fullBlock));
+      }
+      currentDateIndex++;
+    } else {
+      // Les blocs d'autres dates restent inchangés (mais corrigés au besoin)
+      newBlocks.push(fixBlock(block.fullBlock));
+    }
+  }
+
+  // Reconstruire la chaîne à partir des blocs filtrés
+  formation.participants = newBlocks.join(", ").trim();
+
+  await updateFormationParticipantsInSheet(
+    formation.id,
+    formation.participants
+  );
+  showParticipantsModal(formation, date);
+}
+
+// Fonction d'échappement pour utiliser une chaîne dans une regex
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/* ---------------------- Mise à Jour dans le Sheet ---------------------- */
+async function updateFormationParticipantsInSheet(id, participantsStr) {
+  try {
+    const url = `${SCRIPT_URL}?action=updateParticipants&id=${id}&participants=${encodeURIComponent(
+      participantsStr
+    )}`;
+    const response = await fetch(url);
+    const result = await response.json();
+    console.log("Participants mis à jour :", result);
+    if (typeof window.fetchFormations === "function") {
+      await window.fetchFormations();
+    }
+  } catch (error) {
+    console.error(
+      "Erreur lors de la mise à jour des participants :",
+      error.message
+    );
+  }
+}
 
 /* =================== Formulaire de Rendez-vous =================== */
 function initAppointmentForm(showNotification) {
@@ -727,8 +965,7 @@ function initAppointmentForm(showNotification) {
       }
     });
 
-    // Vérifier que le nombre d'employés ajoutés n'excède pas la limite (12)
-    // Récupérer la formation sélectionnée (en utilisant le même JSONP) pour compter les participants actuels
+    // Vérifier la limite de participants
     const formationData = window.currentFormationsData.find(
       (f) => parseInt(f.id) === parseInt(formationSelect.value)
     );
@@ -808,14 +1045,12 @@ function populateAppointmentFormFormations() {
     if (data && data.values) {
       formationsData = data.values;
     }
-    // Sauvegarder dans une variable globale pour le formulaire
     window.currentFormationsData = formationsData;
     const formationSelect = document.getElementById("formationSelect");
     formationSelect.innerHTML = "";
     formationsData.forEach((formation) => {
       const option = document.createElement("option");
       option.value = formation.id;
-      // Pour le select, si aucune date n'est trouvée, le nombre est 0
       option.text = `${formation.name}`;
       formationSelect.appendChild(option);
     });
@@ -842,19 +1077,16 @@ function updateDateSelect(formationSelect, formationsData) {
     }
     if (dates.length > 0) {
       dates.forEach((d) => {
-        let dateStr = d.trim();
-        let dateObj = new Date(dateStr);
-        if (!isNaN(dateObj)) {
-          let dd = dateObj.getDate().toString().padStart(2, "0");
-          let mm = (dateObj.getMonth() + 1).toString().padStart(2, "0");
-          let yyyy = dateObj.getFullYear();
-          dateStr = `${dd}/${mm}/${yyyy}`;
-        }
-        // Calcul du nombre de participants pour cette date
-        let count = formation ? getParticipantsCount(formation, dateStr) : 0;
+        // Save the original date string as stored in the formation
+        let originalDate = d.trim();
+        // Display the date in dd/mm/yyyy format
+        let formatted = formatDateToDDMMYYYY(originalDate);
+        // getParticipantsCount expects the displayed format
+        let count = formation ? getParticipantsCount(formation, formatted) : 0;
         const option = document.createElement("option");
-        option.value = dateStr;
-        option.text = `${dateStr} (${count}/12)`;
+        // Keep the original format for the value so that it is sent to the sheet
+        option.value = originalDate;
+        option.text = `${formatted} (${count}/12)`;
         dateSelect.appendChild(option);
       });
     } else {
@@ -869,42 +1101,6 @@ function updateDateSelect(formationSelect, formationsData) {
     option.text = "Aucune date disponible";
     dateSelect.appendChild(option);
   }
-}
-
-/* =================== Helper Functions =================== */
-function getParticipantsCount(formation, date) {
-  let count = 0;
-  if (formation.participants) {
-    const regex = /(\[.*?\])\s*\((.*?)\)/g;
-    let match;
-    while ((match = regex.exec(formation.participants)) !== null) {
-      try {
-        let parsedDate = new Date(match[2]);
-        let dd = parsedDate.getDate().toString().padStart(2, "0");
-        let mm = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
-        let yyyy = parsedDate.getFullYear();
-        let formattedDate = `${dd}/${mm}/${yyyy}`;
-        if (formattedDate === date) {
-          const empData = JSON.parse(match[1]);
-          let empArray = Array.isArray(empData) ? empData : [empData];
-          count += empArray.length;
-        }
-      } catch (e) {
-        console.error("Erreur lors du parsing des participants:", e);
-      }
-    }
-  }
-  return count;
-}
-
-function formatDateFromString(dateStr) {
-  if (!dateStr) return "";
-  let dateObj = new Date(dateStr.trim());
-  if (isNaN(dateObj)) return dateStr;
-  let dd = dateObj.getDate().toString().padStart(2, "0");
-  let mm = (dateObj.getMonth() + 1).toString().padStart(2, "0");
-  let yyyy = dateObj.getFullYear();
-  return `${dd}/${mm}/${yyyy}`;
 }
 
 /* =================== Gestion des Cookies =================== */
@@ -984,4 +1180,52 @@ function initEmployeeTable() {
   });
 
   updateButtons();
+}
+
+async function runArchiveProcess() {
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=archive`);
+    const result = await response.json();
+    if (result.success) {
+      console.log("Archiving completed successfully.");
+    } else {
+      console.error("Archiving error:", result.error);
+    }
+  } catch (error) {
+    console.error("Error calling archive action:", error);
+  }
+}
+
+async function fetchArchives() {
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=readArchives`);
+    const responseJson = await response.json();
+    const tbody = document
+      .getElementById("archivesTable")
+      .querySelector("tbody");
+
+    if (
+      !responseJson ||
+      !responseJson.values ||
+      responseJson.values.length === 0
+    ) {
+      tbody.innerHTML =
+        "<tr><td colspan='4'>Aucun historique disponible</td></tr>";
+      return;
+    }
+
+    tbody.innerHTML = "";
+    responseJson.values.forEach((entry) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${entry.id}</td>
+        <td>${entry.formation}</td>
+        <td>${entry.date}</td>
+        <td>${entry.participants}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'historique:", error);
+  }
 }

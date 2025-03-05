@@ -1,1 +1,10 @@
-rajouter les notifications sur les modifications de formations, suprimation de formations, acceptation et refus.
+Pouvoir faire une extraction des participants.
+
+créer une nouvelle sheet appelé historique de formations, quand une date de formation est passée
+celle ci se stock dans le sheet avec les informations comme nom de la formation, date, participants,
+la date sera donc éffacé de l'ancienne sheet ainsi que les participants de cette date de formation tout en gardant les dates à venir bien evidemment,
+si c'était la dernière date, bien evidemment la ligne sera effacé et ce qu'il en restait ira dans la sheet historique.
+la sheet historique se presentera ainsi.
+
+ID | Formation 1 | 02/03/2025 | participants1 (matricule, nom, entite), participants2 (matricule, nom, entite)
+
