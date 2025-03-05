@@ -667,6 +667,8 @@ textarea {
 
 .formation-actions {
   display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
@@ -1450,6 +1452,63 @@ modal2-title{
   background-color: #005fa3;
   cursor: pointer;
 }
+
+/* Bouton d'accès au calendrier */
+.calendar-btn {
+  width: 300px;
+  background-color: #f49f42 !important;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.calendar-btn:hover {
+  background-color: #d47f00 !important;
+}
+
+/* Modal */
+#calendarModal .modal {
+  display: none; /* Masqué par défaut */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+#calendarModal .modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 6px;
+  max-width: 50%;
+  position: relative;
+}
+
+/* Bouton de fermeture */
+.close {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+}
+
+/* FullCalendar */
+#calendar {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
 
 footer {
   font-size: 12px;

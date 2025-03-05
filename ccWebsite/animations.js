@@ -307,6 +307,7 @@ function initAdminPanel() {
         availableDates: row.availableDates,
         participants: row.participants,
       }));
+      window.formationsData = formationsData;
       renderFormations();
     } catch (error) {
       console.error(
@@ -315,7 +316,6 @@ function initAdminPanel() {
       );
     }
   };
-  window.fetchFormations = fetchFormations; // Exposer globalement
 
   const addFormationToSheet = async (name, dates) => {
     const newId =
@@ -374,7 +374,7 @@ function initAdminPanel() {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${formation.id}</td>
-        <td>${formation.name}</td>
+        <td class="data-formation">${formation.name}</td>
         <td>${
           formation.availableDates
             ? renderAvailableDates(formation.availableDates, formation)
@@ -405,6 +405,7 @@ function initAdminPanel() {
       });
     });
   };
+  window.formationsData = formationsData;
 
   function renderAvailableDates(datesStr, formation) {
     if (!datesStr) return "";
@@ -707,6 +708,7 @@ function customConfirm(message) {
 
 /* =================== Modal Participants =================== */
 function showParticipantsModal(formation, date) {
+  console.log("Participants pour la formation :", formation, date);
   const modal = document.getElementById("participantsModal");
   const modalDate = document.getElementById("modalDate");
   const modalTitle = document.getElementById("formation-name-modal");
@@ -1330,3 +1332,110 @@ async function fetchArchives() {
     console.error("Erreur lors de la récupération de l'historique:", error);
   }
 }
+
+// Fonction pour convertir une date au format DD/MM/YYYY en format ISO (YYYY-MM-DD)
+function convertDMYToISO(dateStr) {
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    const day = parts[0].padStart(2, "0");
+    const month = parts[1].padStart(2, "0");
+    const year = parts[2];
+    return `${year}-${month}-${day}`;
+  }
+  return dateStr;
+}
+
+// Fonction pour extraire les événements à partir du tableau des formations
+function getEventsFromFormations() {
+  // Sélectionne toutes les lignes du tableau de formations
+  const formationRows = document.querySelectorAll("#formationsTable tbody tr");
+  const eventsMap = new Map(); // Pour éviter les doublons
+
+  formationRows.forEach((row) => {
+    // Récupérer l'ID de la formation depuis la première cellule
+    const idCell = row.querySelector("td");
+    if (!idCell) return;
+    const formationId = idCell.textContent.trim();
+
+    // Récupérer le nom de la formation depuis la cellule avec la classe "data-formation"
+    const formationNameCell = row.querySelector(".data-formation");
+    if (!formationNameCell) return;
+    const formationName = formationNameCell.textContent.trim();
+
+    // Récupérer toutes les dates cliquables dans cette ligne
+    const clickableDates = row.querySelectorAll(".clickable-date");
+    clickableDates.forEach((span) => {
+      const dateStr = span.getAttribute("data-date");
+      if (!dateStr) return;
+      const isoDate = convertDMYToISO(dateStr);
+      // Construire une clé unique pour éviter les doublons
+      const key = isoDate + "|" + formationName;
+      if (!eventsMap.has(key)) {
+        eventsMap.set(key, {
+          title: formationName,
+          start: isoDate,
+          extendedProps: { formationId: formationId },
+        });
+      }
+    });
+  });
+
+  return Array.from(eventsMap.values());
+}
+
+function initCalendarFromFormations() {
+  const events = getEventsFromFormations();
+  const calendarEl = document.getElementById("calendar");
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: "dayGridMonth",
+    headerToolbar: {
+      left: "prev,next today",
+      center: "title",
+      right: "",
+    },
+    events: events,
+    eventClick: function (info) {
+      // Convertir la date de l'événement en format DD/MM/YYYY
+      const d = info.event.start;
+      const day = ("0" + d.getDate()).slice(-2);
+      const month = ("0" + (d.getMonth() + 1)).slice(-2);
+      const year = d.getFullYear();
+      const formattedDate = `${day}/${month}/${year}`;
+
+      // Récupérer formationId depuis extendedProps
+      const formationId = info.event.extendedProps.formationId;
+
+      // Chercher la formation dans la variable globale formationsData
+      const formation = window.formationsData.find(
+        (f) => f.id.toString() === formationId
+      );
+      if (formation) {
+        showParticipantsModal(formation, formattedDate);
+      } else {
+        alert("Formation not found for ID: " + formationId);
+      }
+    },
+  });
+  calendar.render();
+}
+
+// Gestion du modal calendrier
+const openCalendarBtn = document.getElementById("openCalendarBtn");
+const calendarModal = document.getElementById("calendarModal");
+const closeCalendar = document.getElementById("closeCalendar");
+
+openCalendarBtn.addEventListener("click", () => {
+  calendarModal.style.display = "block";
+  initCalendarFromFormations();
+});
+
+closeCalendar.addEventListener("click", () => {
+  calendarModal.style.display = "none";
+});
+
+window.addEventListener("click", (event) => {
+  if (event.target === calendarModal) {
+    calendarModal.style.display = "none";
+  }
+});

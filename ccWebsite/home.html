@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
+    <!-- Ajoutez ces lignes dans le head de votre document -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+
     <title>Candor Campus</title>
   </head>
   <body>
@@ -752,10 +756,22 @@
       </div>
     </div>
     <div id="adminPanel" style="display: none">
+      <!-- Modal Calendrier -->
+      <div id="calendarModal" class="modal">
+        <div class="modal-content">
+          <span class="close" id="closeCalendar">&times;</span>
+          <div id="calendar"></div>
+        </div>
+      </div>
+
+
       <div class="admin-container">
         <h2>Gestion des Formations</h2>
         <div class="formation-actions">
           <button id="addFormationButton" class="submit-button">Ajouter une Formation</button>
+                <!-- Bouton pour ouvrir le calendrier -->
+          <button id="openCalendarBtn" class="calendar-btn">Accéder au calendrier</button>
+
           <button id="logoutButton" class="submit-button">Déconnexion</button>
         </div>
         <table id="formationsTable" border="1">
