@@ -1,6 +1,6 @@
 // URL de votre Web App Google Apps Script
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxGBnMJYLQyqbTuQuQ42zsyUN8P8Of36gLaFWbFm8fPZqEEtMVEDjQnZucte11GlpBaTg/exec";
+  "https://script.google.com/macros/s/AKfycbzxN8myo5cG131GO2-agE4S_hzYE8P9vjYkmrWTNcCnzvDAqdLVhS01c9Fhu10qTMhCSg/exec";
 
 // ---------------------- Fonctions Utilitaires Globales ----------------------
 
@@ -1181,6 +1181,24 @@ function initEmployeeTable() {
 
   updateButtons();
 }
+// Fonction de formatage côté client : si la chaîne n'est pas déjà au format JJ/MM/AAAA, on la reformate.
+function formatDateClient(dateStr) {
+  // Si la chaîne contient "/" et fait exactement 10 caractères, on suppose qu'elle est déjà au bon format (ex: "31/12/2025")
+  if (dateStr && dateStr.includes("/") && dateStr.length === 10) {
+    return dateStr;
+  }
+  // Sinon, essayer de créer un objet Date
+  const d = new Date(dateStr);
+  if (!isNaN(d)) {
+    const day = ("0" + d.getDate()).slice(-2);
+    const month = ("0" + (d.getMonth() + 1)).slice(-2);
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+  return dateStr;
+}
+
+/* =================== ARCHIVES =================== */
 
 async function runArchiveProcess() {
   try {
@@ -1196,6 +1214,65 @@ async function runArchiveProcess() {
   }
 }
 
+// Fonction de filtrage combiné (barre de recherche + filtre par date)
+function filterArchives() {
+  const searchTerm = document
+    .getElementById("archiveSearch")
+    .value.trim()
+    .toLowerCase();
+  const selectedDate = document.getElementById("archiveDateFilter").value;
+  const tbody = document.getElementById("archivesTable").querySelector("tbody");
+  const rows = tbody.getElementsByTagName("tr");
+
+  for (let i = 0; i < rows.length; i++) {
+    const cells = rows[i].getElementsByTagName("td");
+    const formationText = cells[1].textContent.toLowerCase();
+    const dateText = cells[2].textContent.trim();
+    const participantsText = cells[3].textContent.toLowerCase();
+
+    const matchesSearch =
+      formationText.includes(searchTerm) ||
+      participantsText.includes(searchTerm);
+    const matchesDate = selectedDate === "" || dateText === selectedDate;
+
+    rows[i].style.display = matchesSearch && matchesDate ? "" : "none";
+  }
+}
+
+// Fonction pour peupler le filtre par date sans doublons
+function populateArchiveDateFilter() {
+  const tbody = document.getElementById("archivesTable").querySelector("tbody");
+  const rows = tbody.getElementsByTagName("tr");
+  const datesSet = new Set();
+
+  for (let i = 0; i < rows.length; i++) {
+    // On utilise le contenu de la 3ème cellule qui doit être au format JJ/MM/AAAA grâce à formatDateClient
+    const date = rows[i].getElementsByTagName("td")[2].textContent.trim();
+    if (date !== "") {
+      datesSet.add(date);
+    }
+  }
+  const dateFilter = document.getElementById("archiveDateFilter");
+  dateFilter.innerHTML = `<option value="">Toutes les dates</option>`;
+  Array.from(datesSet)
+    .sort()
+    .forEach((date) => {
+      const option = document.createElement("option");
+      option.value = date;
+      option.textContent = date;
+      dateFilter.appendChild(option);
+    });
+}
+
+// Ajout d'écouteurs sur la barre de recherche et le select
+document
+  .getElementById("archiveSearch")
+  .addEventListener("input", filterArchives);
+document
+  .getElementById("archiveDateFilter")
+  .addEventListener("change", filterArchives);
+
+// Fonction fetchArchives mise à jour pour formater la date côté client
 async function fetchArchives() {
   try {
     const response = await fetch(`${SCRIPT_URL}?action=readArchives`);
@@ -1216,15 +1293,39 @@ async function fetchArchives() {
 
     tbody.innerHTML = "";
     responseJson.values.forEach((entry) => {
+      // Formatage explicite de la date côté client
+      const formattedDate = formatDateClient(entry.date);
+
+      // Pour les participants : découper la chaîne avec "|||"
+      let participantsHTML = "";
+      const blocks = entry.participants.split("|||");
+      blocks.forEach((block) => {
+        block = block.trim();
+        if (block) {
+          try {
+            const arr = JSON.parse(block);
+            if (Array.isArray(arr) && arr.length > 0) {
+              const p = arr[0];
+              participantsHTML += `<div>${p.matricule} - ${p.nameEmployee} - ${p.entity}</div>`;
+            }
+          } catch (e) {
+            console.error("Erreur de parsing du participant:", e);
+          }
+        }
+      });
+
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${entry.id}</td>
         <td>${entry.formation}</td>
-        <td>${entry.date}</td>
-        <td>${entry.participants}</td>
+        <td>${formattedDate}</td>
+        <td>${participantsHTML}</td>
       `;
       tbody.appendChild(row);
     });
+
+    // Peupler le menu déroulant des dates (sans doublons) en utilisant le format JJ/MM/AAAA
+    populateArchiveDateFilter();
   } catch (error) {
     console.error("Erreur lors de la récupération de l'historique:", error);
   }

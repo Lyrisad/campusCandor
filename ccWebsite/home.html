@@ -798,6 +798,12 @@
       <!-- Historique Panel -->
       <div id="historiquePanel">
         <h3>Historique des formations passées</h3>
+        <div class="filter-container">
+          <input type="text" id="archiveSearch" placeholder="Recherche par formation ou participant" />
+          <select id="archiveDateFilter">
+            <option value="">Toutes les dates</option>
+          </select>
+        </div>
         <table id="archivesTable" border="1">
           <thead>
             <tr>
@@ -808,10 +814,11 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Archive rows will be injected via JavaScript -->
+            <!-- Les lignes de l'archive seront injectées via JavaScript -->
           </tbody>
         </table>
       </div>
+      
     </div>
       <div id="formationModal" class="modal" style="display: none">
         <div class="modal-content">
