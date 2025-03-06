@@ -1,6 +1,6 @@
 // URL de votre Web App Google Apps Script
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzxN8myo5cG131GO2-agE4S_hzYE8P9vjYkmrWTNcCnzvDAqdLVhS01c9Fhu10qTMhCSg/exec";
+  "https://script.google.com/macros/s/AKfycbyTxVIekVUyRSUafBPEzQGaK2goS1zqMi8qLoeESNhvk3XXbPSFyyjyJkuBWjWG5btvAA/exec";
 
 // ---------------------- Fonctions Utilitaires Globales ----------------------
 
@@ -121,6 +121,8 @@ document.addEventListener("DOMContentLoaded", () => {
   runArchiveProcess();
   // Then refresh the Historique panel
   fetchArchives();
+  fetchTasks();
+  fetchTasksHistory();
 });
 
 /* =================== Navigation =================== */
@@ -316,6 +318,7 @@ function initAdminPanel() {
       );
     }
   };
+  window.fetchFormations = fetchFormations;
 
   const addFormationToSheet = async (name, dates) => {
     const newId =
@@ -815,18 +818,23 @@ function showParticipantsModal(formation, date) {
 
   // Gestion de l'ajout d'un participant
   document.getElementById("btnAddParticipant").addEventListener("click", () => {
-    showNotification("Ajout en cours, veuillez patienter..");
+    document.getElementById("btnAddParticipant").disabled = true;
     const matricule = document.getElementById("newMatricule").value.trim();
     const nameEmployee = document.getElementById("newName").value.trim();
     const entity = document.getElementById("newEntity").value.trim();
     if (!matricule || !nameEmployee || !entity) {
-      alert("Veuillez remplir tous les champs");
+      document.getElementById("btnAddParticipant").disabled = false;
+      showNotification("Veuillez remplir tous les champs.");
       return;
     }
+    showNotification("Ajout en cours, veuillez patienter..");
     const newParticipant = { matricule, nameEmployee, entity };
     addParticipantToFormation(formation, date, newParticipant);
+
     setTimeout(() => {
+      document.getElementById("btnAddParticipant").disabled = false;
       showNotification("Participant ajouté avec succès !");
+      window.fetchFormations();
     }, 4000);
   });
 
@@ -864,7 +872,21 @@ async function addParticipantToFormation(formation, date, newParticipant) {
     formation.id,
     formation.participants
   );
-  showParticipantsModal(formation, date);
+
+  // Refresh formations. Use the global function if available; otherwise, use the local one.
+  if (typeof window.fetchFormations === "function") {
+    await window.fetchFormations();
+  } else if (typeof fetchFormations === "function") {
+    await fetchFormations();
+  } else {
+    console.error("fetchFormations function is not available.");
+  }
+
+  // Retrieve the updated formation from global data.
+  const updatedFormation = window.formationsData.find(
+    (f) => f.id === formation.id
+  );
+  showParticipantsModal(updatedFormation, date);
 }
 
 // Lorsqu'on supprime, on reconstruit la chaîne en supprimant le bloc ciblé
@@ -980,6 +1002,13 @@ function initAppointmentForm(showNotification) {
       );
       return;
     }
+    // Si le message est vide, on le remplace par "Aucun message"
+    const messageText = message.trim() === "" ? "Aucun message" : message;
+
+    // Utilisez "\n" pour un email en texte brut, ou "<br>" si l'email est en HTML
+    const employeesList = employees
+      .map((emp) => `${emp.matricule} - ${emp.nameEmployee} (${emp.entity})`)
+      .join("\n");
 
     const formData = {
       name,
@@ -987,8 +1016,8 @@ function initAppointmentForm(showNotification) {
       phone,
       formation: formationName,
       date,
-      message,
-      employees: JSON.stringify(employees),
+      message: messageText,
+      employees: employeesList,
     };
 
     emailjs
@@ -1332,7 +1361,6 @@ async function fetchArchives() {
     console.error("Erreur lors de la récupération de l'historique:", error);
   }
 }
-
 // Fonction pour convertir une date au format DD/MM/YYYY en format ISO (YYYY-MM-DD)
 function convertDMYToISO(dateStr) {
   const parts = dateStr.split("/");
@@ -1362,19 +1390,50 @@ function getEventsFromFormations() {
     if (!formationNameCell) return;
     const formationName = formationNameCell.textContent.trim();
 
+    // Récupérer l'objet formation complet à partir de window.formationsData
+    const formationObj = window.formationsData
+      ? window.formationsData.find((f) => f.id.toString() === formationId)
+      : null;
+
     // Récupérer toutes les dates cliquables dans cette ligne
     const clickableDates = row.querySelectorAll(".clickable-date");
     clickableDates.forEach((span) => {
       const dateStr = span.getAttribute("data-date");
       if (!dateStr) return;
       const isoDate = convertDMYToISO(dateStr);
-      // Construire une clé unique pour éviter les doublons
+
+      // Calculer le nombre de participants pour cette formation et cette date
+      let count = 0;
+      if (formationObj) {
+        count = getParticipantsCount(formationObj, dateStr);
+      } else {
+        // Si formationObj n'est pas disponible, on tente d'extraire le compte depuis le texte du span (format "DD/MM/YYYY (X/12)")
+        let countMatch = span.textContent.match(/\((\d+)\/12\)/);
+        if (countMatch && countMatch[1]) {
+          count = parseInt(countMatch[1], 10);
+        }
+      }
+
+      // Déterminer la couleur de fond selon le nombre de participants
+      let bgColor = "grey";
+      if (count >= 1 && count <= 5) {
+        bgColor = "#f49f42";
+      } else if (count >= 6) {
+        bgColor = "#37ec5f";
+      }
+
+      // Construire le titre de l'événement au format "Formation Name (X/12)"
+      const eventTitle = `${formationName} (${count}/12)`;
+
+      // Créer une clé unique pour éviter les doublons
       const key = isoDate + "|" + formationName;
       if (!eventsMap.has(key)) {
         eventsMap.set(key, {
-          title: formationName,
+          title: eventTitle,
           start: isoDate,
-          extendedProps: { formationId: formationId },
+          backgroundColor: bgColor,
+          borderColor: bgColor,
+          extendedProps: { formationId: formationId, count: count },
         });
       }
     });
@@ -1388,6 +1447,7 @@ function initCalendarFromFormations() {
   const calendarEl = document.getElementById("calendar");
 
   const calendar = new FullCalendar.Calendar(calendarEl, {
+    locale: "fr",
     initialView: "dayGridMonth",
     headerToolbar: {
       left: "prev,next today",
@@ -1439,3 +1499,208 @@ window.addEventListener("click", (event) => {
     calendarModal.style.display = "none";
   }
 });
+
+/* =================== TÂCHES MODULE =================== */
+
+// Task Form submission: l'état est forcé à "Due"
+document.getElementById("taskForm").addEventListener("submit", async (e) => {
+  showNotification("Veuillez patienter.. Ajout de tâche en cours.");
+  e.preventDefault();
+  const concerne = document.getElementById("taskConcerne").value.trim();
+  const tache = document.getElementById("taskDescription").value.trim();
+  const importance = document.getElementById("taskImportance").value;
+  const etat = "Due"; // Forcé lors de la création
+
+  const url = `${SCRIPT_URL}?action=addTask&concerne=${encodeURIComponent(
+    concerne
+  )}&tache=${encodeURIComponent(tache)}&importance=${encodeURIComponent(
+    importance
+  )}&etat=${encodeURIComponent(etat)}`;
+
+  try {
+    const response = await fetch(url);
+    const result = await response.json();
+    if (result.success) {
+      await fetchTasks();
+      await fetchTasksHistory();
+      // Optionnel: réinitialiser le formulaire
+      document.getElementById("taskForm").reset();
+
+      showNotification("Tâche ajoutée avec succès !");
+    } else {
+      showNotification("Erreur lors de l'ajout de la tâche: " + result.error);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+// Function to fetch active tasks (state "Due")
+async function fetchTasks() {
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=readTasks`);
+    const data = await response.json();
+    const container = document.getElementById("activeTasksContainer");
+    if (!data || !data.values || data.values.length === 0) {
+      container.innerHTML = "<p>Aucune tâche active.</p>";
+      return;
+    }
+    let html = `
+      <table class="tasks-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Concerne</th>
+            <th>Tâche</th>
+            <th>Importance</th>
+            <th>État</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    data.values.forEach((task) => {
+      html += `<tr>
+                <td>${task.id}</td>
+                <td>${task.concerne}</td>
+                <td>${task.tache}</td>
+                <td>${task.importance}</td>
+                <td>${task.etat}</td>
+                <td>
+                  <button class="btn-complete-task" data-id="${task.id}">Accompli</button>
+                  <button class="btn-delete-task" data-id="${task.id}">Supprimer</button>
+                </td>
+              </tr>`;
+    });
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+
+    // Attach event listeners for "Accompli" button
+    document.querySelectorAll(".btn-complete-task").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const id = e.target.getAttribute("data-id");
+        try {
+          const response = await fetch(
+            `${SCRIPT_URL}?action=updateTaskState&id=${id}&etat=Accomplie`
+          );
+          const result = await response.json();
+          if (!result.success) {
+            alert(
+              "Erreur lors de la mise à jour de l'état de la tâche: " +
+                result.error
+            );
+          }
+          await fetchTasks();
+          await fetchTasksHistory();
+        } catch (error) {
+          console.error("Erreur updateTaskState:", error);
+        }
+      });
+    });
+
+    // Attach event listeners for "Supprimer" button
+    document.querySelectorAll(".btn-delete-task").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        showNotification("Veuillez patienter.. Suppression de tâche en cours.");
+        const id = e.target.getAttribute("data-id");
+        await deleteTask(id);
+        await fetchTasks();
+        setTimeout(() => {
+          showNotification("Tâche supprimée avec succès !");
+        }, 1000);
+      });
+    });
+  } catch (error) {
+    showNotification("Erreur lors de la récupération des tâches actives.");
+  }
+}
+// Function to fetch tasks history (state "Accomplie")
+async function fetchTasksHistory() {
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=readTasksHistory`);
+    const data = await response.json();
+    const container = document.getElementById("tasksHistoryContainer");
+    if (!data || !data.values || data.values.length === 0) {
+      container.innerHTML = "<p>Aucune tâche accomplie.</p>";
+      return;
+    }
+    let html = `
+      <table class="tasks-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Concerne</th>
+            <th>Tâche</th>
+            <th class="colorTask">Importance</th>
+            <th>État</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    data.values.forEach((task) => {
+      html += `<tr class="task-history-row">
+                <td>${task.id}</td>
+                <td>${task.concerne}</td>
+                <td>${task.tache}</td>
+                <td>${task.importance}</td>
+                <td>${task.etat}</td>
+                <td><button class="btn-delete-task" data-id="${task.id}">Supprimer</button></td>
+              </tr>`;
+    });
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+
+    // Attach event listeners for "Supprimer" button in history
+    document
+      .querySelectorAll("#tasksHistoryContainer .btn-delete-task")
+      .forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          const id = e.target.getAttribute("data-id");
+          await deleteTask(id);
+          await fetchTasksHistory();
+        });
+      });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération de l'historique des tâches :",
+      error
+    );
+  }
+}
+
+// Function to delete a task by ID
+async function deleteTask(id) {
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=deleteTask&id=${id}`);
+    const result = await response.json();
+    if (!result.success) {
+      console.log("Erreur lors de la suppression de la tâche: " + result.error);
+    }
+  } catch (error) {
+    console.error("Erreur lors de la suppression de la tâche:", error);
+  }
+}
+
+// Listener for "Effacer l'historique" button
+document
+  .getElementById("clearHistoryBtn")
+  .addEventListener("click", async () => {
+    if (
+      confirm(
+        "Voulez-vous vraiment effacer l'historique des tâches accomplies ?"
+      )
+    ) {
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=clearTasksHistory`);
+        const result = await response.json();
+        if (result.success) {
+          await fetchTasksHistory();
+        } else {
+          alert("Erreur lors de l'effacement de l'historique: " + result.error);
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'effacement de l'historique:", error);
+      }
+    }
+  });

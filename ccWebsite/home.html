@@ -7,6 +7,8 @@
     <!-- Ajoutez ces lignes dans le head de votre document -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/locales/fr.js"></script>
+
 
     <title>Candor Campus</title>
   </head>
@@ -834,6 +836,45 @@
           </tbody>
         </table>
       </div>
+      
+      <div class="tasks-module">
+        <h3>Ajouter une nouvelle tâche</h3>
+        <form class="task-form" id="taskForm">
+          <div class="form-group">
+            <label for="taskConcerne">Concerne :</label>
+            <input type="text" id="taskConcerne" class="task-concerne" placeholder="À qui la tâche est destinée" required />
+          </div>
+          <div class="form-group">
+            <label for="taskDescription">Tâche :</label>
+            <input type="text" id="taskDescription" class="task-description" placeholder="Description de la tâche" required />
+          </div>
+          <div class="form-group">
+            <label for="taskImportance">Importance :</label>
+            <select id="taskImportance" class="task-importance" required>
+              <option value="vert">Vert</option>
+              <option value="orange">Orange</option>
+              <option value="rouge">Rouge</option>
+            </select>
+          </div>
+          <button type="submit" class="submit-btn">Enregistrer la tâche</button>
+        </form>
+      
+        <div class="tasks-active">
+          <h3>Tâches en cours</h3>
+          <div class="tasks-active-container" id="activeTasksContainer">
+            <!-- Active tasks will be injected here -->
+          </div>
+        </div>
+      
+        <div class="tasks-history">
+          <h3>Historique des tâches accomplies</h3>
+          <div class="tasks-history-container" id="tasksHistoryContainer">
+            <!-- Tasks history will be injected here -->
+          </div>
+          <button class="clear-history-btn" id="clearHistoryBtn">Effacer l'historique</button>
+        </div>
+      </div>
+      
       
     </div>
       <div id="formationModal" class="modal" style="display: none">
